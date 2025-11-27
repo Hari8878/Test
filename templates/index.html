@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Main Portal - Neon UI + IMPDS</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Orbitron',sans-serif;background:#0a0a0a;color:#0ff;overflow-x:hidden;}
+header{position:fixed;width:100%;top:0;left:0;background:#111;padding:15px 25px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 0 15px #0ff;z-index:100;}
+header h1{font-size:26px;text-shadow:0 0 10px #0ff;}
+.menu-toggle{font-size:28px;cursor:pointer;text-shadow:0 0 10px #0ff;}
+.sidebar{height:100%;width:0;position:fixed;top:0;left:0;background:#111;overflow-x:hidden;transition:0.5s;padding-top:60px;box-shadow:0 0 20px #0ff inset;z-index:999;}
+.sidebar a{display:block;padding:15px 25px;text-decoration:none;color:#0ff;font-size:18px;transition:0.3s;text-shadow:0 0 5px #0ff;cursor:pointer;}
+.sidebar a:hover{background:#0ff;color:#111;border-left:4px solid #0ff;}
+.sidebar .closebtn{position:absolute;top:10px;right:20px;font-size:36px;cursor:pointer;color:#0ff;}
+.main{padding:100px 20px 20px 20px;transition:margin-left 0.5s;}
+h2{text-shadow:0 0 15px #0ff;font-size:28px;}
+.function-box{display:none;background:#111;border:1px solid #0ff;padding:25px;margin:20px 0;border-radius:15px;box-shadow:0 0 20px #0ff;animation:fadeIn 0.5s;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.function-box button{padding:12px 20px;background:#0ff;border:none;color:#111;border-radius:5px;cursor:pointer;margin-top:15px;font-weight:bold;text-shadow:0 0 5px #111;transition:0.3s;}
+.function-box button:hover{background:#0a7;box-shadow:0 0 25px #0ff;color:#fff;}
+.author-info,.legal{text-align:center;margin-top:50px;font-size:16px;color:#0ff;text-shadow:0 0 5px #0ff;}
+input[type="file"],input[type="text"],input[type="number"]{margin-top:10px;padding:8px;width:95%;border-radius:5px;border:none;outline:none;background:#222;color:#0ff;border:1px solid #0ff;text-shadow:0 0 5px #0ff;}
+canvas{display:block;margin-top:10px;max-width:100%;border:1px solid #0ff;}
+a.download-link{color:#0ff;display:inline-block;margin-top:10px;text-decoration:none;border:1px solid #0ff;padding:5px 10px;border-radius:5px;text-shadow:0 0 5px #0ff;}
+a.download-link:hover{background:#0ff;color:#111;box-shadow:0 0 20px #0ff;}
+.container{width:100%;max-width:500px;padding:20px;background:rgba(0,0,0,0.3);border-radius:15px;border:1px solid #0ff;box-shadow:0 0 20px #00faff,0 0 35px #00faff inset;margin:0 auto;}
+#loader{display:none;margin-top:10px;color:#0ff;text-align:center;font-size:17px;animation:glow 1s infinite alternate;}
+@keyframes glow{from{text-shadow:0 0 5px #0ff;}to{text-shadow:0 0 18px #0ff;}}
+.error-popup{background:#ff0044;padding:12px;border-radius:10px;text-align:center;margin-top:15px;display:none;font-weight:bold;box-shadow:0 0 12px #ff0044;}
+.result-card{margin-top:20px;padding:16px;background:rgba(0,0,0,0.5);border:1px solid #0ff;border-radius:15px;display:none;box-shadow:0 0 20px #0ff inset;}
+.sec-title{font-size:18px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #0ff;text-shadow:0 0 10px #0ff;}
+.info{margin:6px 0;font-size:15px;line-height:1.5;}
+.member-card{background: rgba(0, 255, 255, 0.08); border:1px solid #0ff; padding:12px; border-radius:10px; margin-top:12px; box-shadow:0 0 10px #00eaff;}
+.history-card{background:#111;border:1px solid #0ff;padding:12px;margin-top:12px;border-radius:10px;box-shadow:0 0 10px #0ff;color:#0ff;}
+</style>
+</head>
+<body>
+
+<header>
+<h1>Main Portal</h1>
+<span class="menu-toggle" onclick="openSidebar()">&#9776;</span>
+</header>
+
+<div id="mySidebar" class="sidebar">
+<span class="closebtn" onclick="closeSidebar()">&times;</span>
+<a onclick="showFunction('home')">Home</a>
+<a onclick="showFunction('imageUpload')">Image Compress</a>
+<a onclick="showFunction('fileNameChanger')">File Name Changer</a>
+<a onclick="showFunction('imgToPdf')">Image to PDF</a>
+<a onclick="showFunction('pdfToImg')">PDF to Image</a>
+<a onclick="showFunction('fetchMembers')">Fetch Members</a>
+</div>
+
+<div class="main">
+<div id="home">
+<h2>Welcome to the Main Portal</h2>
+<div class="author-info"><p>Author & Developer: Harikrishnan K</p>
+<p class="legal">⚠️ Legal Usage: Personal or authorized use only.</p></div>
+</div>
+
+<!-- IMAGE COMPRESS -->
+<div id="imageUpload" class="function-box">
+<h3>Image Compress</h3>
+<input type="file" accept="image/*" id="uploadImage">
+<input type="number" id="targetSize" placeholder="Target size KB">
+<button onclick="compressImage()">Compress Image</button>
+<br>
+<canvas id="canvas"></canvas>
+<a id="downloadImg" class="download-link" style="display:none" download="compressed.png">Download Compressed Image</a>
+</div>
+
+<!-- FILE NAME CHANGER -->
+<div id="fileNameChanger" class="function-box">
+<h3>File Name Changer</h3>
+<input type="file" id="renameFile">
+<input type="text" id="newFileName" placeholder="New file name with extension">
+<button onclick="renameFile()">Rename & Download</button>
+</div>
+
+<!-- IMAGE TO PDF -->
+<div id="imgToPdf" class="function-box">
+<h3>Image to PDF</h3>
+<input type="file" accept="image/*" id="img2pdf">
+<button onclick="convertImgToPdf()">Convert to PDF</button>
+</div>
+
+<!-- PDF TO IMAGE -->
+<div id="pdfToImg" class="function-box">
+<h3>PDF to Image</h3>
+<input type="file" accept="application/pdf" id="pdf2img">
+<button onclick="convertPdfToImg()">Convert to Images</button>
+<div id="pdfImages"></div>
+</div>
+
+<!-- FETCH MEMBERS -->
+<div id="fetchMembers" class="function-box">
+<h3>✨ IMPDS Fetch Members ✨</h3>
+<div class="container">
+<input type="text" id="aadhaar" maxlength="12" placeholder="Enter 12-digit Aadhaar">
+<button onclick="fetchData()">Fetch Details</button>
+<div id="loader">⏳ Fetching data...</div>
+<div class="error-popup" id="errorBox"></div>
+<div class="result-card" id="resultBox"></div>
+<div id="historyBox" class="history-card"></div>
+</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.239/pdf.min.js"></script>
+<script>
+// Sidebar
+function openSidebar(){document.getElementById("mySidebar").style.width="250px";document.querySelector(".main").style.marginLeft="250px";}
+function closeSidebar(){document.getElementById("mySidebar").style.width="0";document.querySelector(".main").style.marginLeft="0";}
+function showFunction(id){const boxes=document.querySelectorAll('.function-box, #home');boxes.forEach(box=>box.style.display='none');document.getElementById(id).style.display='block';closeSidebar();}
+showFunction('home');
+
+// IMAGE COMPRESS
+function compressImage(){const file=document.getElementById('uploadImage').files[0];const targetKB=parseInt(document.getElementById('targetSize').value);if(!file||!targetKB) return alert("Select image & target size");const reader=new FileReader();reader.onload=e=>{const img=new Image();img.src=e.target.result;img.onload=()=>{const canvas=document.getElementById('canvas');canvas.width=img.width;canvas.height=img.height;const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0);let quality=0.9;function compressLoop(){const dataURL=canvas.toDataURL('image/jpeg',quality);const sizeKB=(dataURL.length*3/4)/1024;if(sizeKB<=targetKB || quality<=0.1){const download=document.getElementById('downloadImg');download.href=dataURL;download.style.display='inline';return;}quality-=0.05;compressLoop();}compressLoop();}};reader.readAsDataURL(file);}
+
+// FILE NAME CHANGER
+function renameFile(){const file=document.getElementById('renameFile').files[0];const newName=document.getElementById('newFileName').value;if(!file||!newName)return alert("Select file & enter new name");const url=URL.createObjectURL(file);const a=document.createElement('a');a.href=url;a.download=newName;a.click();URL.revokeObjectURL(url);}
+
+// IMAGE TO PDF
+function convertImgToPdf(){const file=document.getElementById('img2pdf').files[0];if(!file)return alert("Select image");const reader=new FileReader();reader.onload=e=>{const img=new Image();img.src=e.target.result;img.onload=()=>{const { jsPDF }=window.jspdf;const pdf=new jsPDF();pdf.addImage(img,'JPEG',10,10,190,(190*img.height)/img.width);pdf.save('converted.pdf');}};reader.readAsDataURL(file);}
+
+// PDF TO IMAGE
+async function convertPdfToImg(){const file=document.getElementById('pdf2img').files[0];if(!file)return alert("Select PDF");const url=URL.createObjectURL(file);const pdfImagesDiv=document.getElementById('pdfImages');pdfImagesDiv.innerHTML='';const loadingTask=pdfjsLib.getDocument(url);loadingTask.promise.then(async pdf=>{for(let i=1;i<=pdf.numPages;i++){const page=await pdf.getPage(i);const viewport=page.getViewport({scale:2});const canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;const ctx=canvas.getContext('2d');await page.render({canvasContext:ctx,viewport}).promise;pdfImagesDiv.appendChild(canvas);}});}
+
+// IMPDS Fetch Members with History
+let queryHistory=[];
+function fetchData(){
+    let aadhaar=document.getElementById("aadhaar").value.trim();
+    let loader=document.getElementById("loader");
+    let errorBox=document.getElementById("errorBox");
+    let resultBox=document.getElementById("resultBox");
+    let historyBox=document.getElementById("historyBox");
+    errorBox.style.display="none"; 
+    resultBox.style.display="none";
+    if(aadhaar.length!==12 || isNaN(aadhaar)){
+        errorBox.innerText="❌ Invalid Aadhaar!";
+        errorBox.style.display="block";
+        return;
+    }
+    loader.style.display="block";
+    fetch(`/fetch?aadhaar=${aadhaar}`).then(res=>res.json()).then(data=>{
+        loader.style.display="none";
+        if(data.error){
+            errorBox.innerText="❌ "+data.error;
+            errorBox.style.display="block";
+            return;
+        }
+
+        // Save query in history
+        queryHistory.unshift(aadhaar);
+        if(queryHistory.length>5) queryHistory.pop();
+
+        // Build result HTML
+        let html=`<div class="sec-title">📍 Address</div><div class="info">${data.address}</div>
+        <div class="sec-title">🪪 Ration Card</div>
+        <div class="info"><b>RC ID:</b> ${data.rcId}</div>
+        <div class="info"><b>Scheme:</b> ${data.schemeName} (${data.schemeId})</div>
+        <div class="info"><b>FPS ID:</b> ${data.fpsId}</div>
+        <div class="sec-title">🌍 Location</div>
+        <div class="info"><b>District:</b> ${data.homeDistName}</div>
+        <div class="info"><b>State:</b> ${data.homeStateName}</div>
+        <div class="sec-title">👨‍👩‍👧 Members</div>`;
+
+        // Add leader SELF entry first
+        html+=`<div class="member-card">
+            <div><b>Name:</b> ${data.leaderName || "Leader"}</div>
+            <div><b>Relation:</b> SELF</div>
+            <div><b>UID:</b> ${data.leaderUid || aadhaar}</div>
+        </div>`;
+
+        // Add other members
+        data.memberDetailsList.forEach(m=>{
+            html+=`<div class="member-card">
+                <div><b>Name:</b> ${m.memberName}</div>
+                <div><b>Relation:</b> ${m.releationship_name}</div>
+                <div><b>UID:</b> ${m.uid}</div>
+            </div>`;
+        });
+
+        resultBox.innerHTML=html;
+        resultBox.style.display="block";
+
+        // Show history
+        historyBox.innerHTML="<b>Recent Queries:</b><br>"+queryHistory.map(a=>`<div>${a}</div>`).join("");
+
+    }).catch(err=>{
+        loader.style.display="none"; 
+        errorBox.innerText="⚠️ Network error!";
+        errorBox.style.display="block";
+    });
+}
+
+</script>
+</body>
+</html>
